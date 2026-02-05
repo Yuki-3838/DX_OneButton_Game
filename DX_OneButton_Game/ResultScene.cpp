@@ -4,7 +4,7 @@ void ResultScene::Init()
 {
 	m_pCamera = new Camera(1920, 1080);
 	// タイトル画面用テクスチャの読み込み
-	m_pResultTex = m_pResourceManager->LoadTexture("asset/texture/title.png", m_pRenderer->GetDevice());
+	m_pResultTex = m_pResourceManager->LoadTexture("asset/texture/Result.png", m_pRenderer->GetDevice());
 
 	m_IsFinished = false;
 }
@@ -29,7 +29,7 @@ void ResultScene::Draw()
 	if (m_pResultTex)
 	{
 		//背景オブジェクトに描画を任せる
-		m_pSpriteRenderer->Draw(m_pRenderer->GetContext(), m_pResultTex, 0.0f, 0.0f, 1920, 1080, viewProj);
+		m_pSpriteRenderer->Draw(m_pRenderer->GetContext(), m_pResultTex, 0.0f, 0.0f, 1200, 900, viewProj);
 	}
 	m_pRenderer->EndFrame();
 }
