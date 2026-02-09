@@ -93,6 +93,12 @@
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル\ゲーム</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>ソース ファイル\ゲームオブジェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="Missile.cpp">
+      <Filter>ソース ファイル\ゲームオブジェクト</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SpriteRenderer.h">
@@ -145,6 +151,12 @@
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>ヘッダー ファイル\ゲーム</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="Missile.h">
+      <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

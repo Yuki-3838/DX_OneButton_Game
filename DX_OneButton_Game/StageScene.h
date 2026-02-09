@@ -3,6 +3,9 @@
 #include "Character.h"
 #include "GameObject.h"
 #include "Camera.h"
+#include "Missile.h"
+#include "Enemy.h"
+#include <vector>
 
 class StageScene : public Scene
 {
