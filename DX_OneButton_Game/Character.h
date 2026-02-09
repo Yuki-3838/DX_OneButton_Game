@@ -9,7 +9,7 @@ protected:
 
 	float m_Gravity;        // 重力加速度
 	float m_MaxFallSpeed;   // 最大落下速度
-	float m_MoveSpeed;      // 水平移動速度]
+	float m_MoveSpeed;      // 水平移動速度
 
 public:
 };
