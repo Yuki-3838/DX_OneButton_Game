@@ -6,11 +6,13 @@
 #include "Missile.h"
 #include "Enemy.h"
 #include <vector>
+#include "GameUI.h"
 
 class StageScene : public Scene
 {
 private:
     Camera* m_pCamera;          // カメラ
+    GameUI* m_pUI;          // ゲームUI
 
     // テクスチャ管理用
     ID3D11ShaderResourceView* m_pPlayerTex;

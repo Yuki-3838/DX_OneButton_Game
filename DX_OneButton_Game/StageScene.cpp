@@ -1,5 +1,6 @@
 #include "StageScene.h"
 #include "Collision.h"
+#include "GameData.h"
 
 void StageScene::Init()
 {
@@ -7,8 +8,15 @@ void StageScene::Init()
 	m_pCamera = new Camera(1920,1080);
 	m_pCamera->SetPosition(0.0f, 0.0f);
 
-	m_pTex = m_pResourceManager->LoadTexture("assets/texture/title.png",m_pRenderer->GetDevice());
+	m_pTex = m_pResourceManager->LoadTexture("asset/texture/title.png",m_pRenderer->GetDevice());
 
+	//UIの初期化
+	m_pUI = new GameUI();
+	m_pUI->Init(m_pRenderer->GetDevice(), m_pResourceManager);
+
+	//スコアのリセット
+	GameData::Reset();
+	
 	//発射台(画面中央)
 	m_pLauncher = new GameObject;
 	m_pLauncher->Init(m_pTex);
@@ -24,127 +32,107 @@ void StageScene::Update()
 	{
 		//画面内に「メインミサイル」があるかを探す
 		Missile* pMain = nullptr;
-		int mainIndex = -1;
+        size_t index = 0;
+        bool found = false;
 
-		for(int i = 0; i < m_Missiles.size();i++)
-		{
-			if (m_Missiles[i]->GetType() == Missile::Type::MAIN)
-			{
-				pMain = m_Missiles[i];
-				mainIndex = i;
-				break;
-			}
-		}
-		if (pMain)
-		{
-			//分裂処理
-			DirectX::XMFLOAT2 pos = pMain->GetPosition();
+        for (size_t i = 0; i < m_Missiles.size(); ++i)
+        {
+            if (m_Missiles[i]->GetType() == Missile::Type::MAIN) 
+            {
+                pMain = m_Missiles[i];
+                index = i;
+                found = true;
+                break;
+            }
+        }
 
-			//メインミサイルを削除
-			delete m_Missiles[mainIndex];
-			m_Missiles.erase(m_Missiles.begin() + mainIndex);
-			//サブミサイルを2つ生成
-			Missile* left = new Missile(Missile::Type::SUB);
-			left->Init(m_pTex);
-			left->SetPosition(pos.x, pos.y);
-			left->SetVelocity(-20.0f, .00f);
-			m_Missiles.push_back(left);
+        if (found)
+        {
+            // 分裂処理
+            DirectX::XMFLOAT2 pos = pMain->GetPosition();
+            delete m_Missiles[index];
+            m_Missiles.erase(m_Missiles.begin() + index);
 
-			Missile* right = new Missile(Missile::Type::SUB);
-			right->Init(m_pTex);
-			right->SetPosition(pos.x, pos.y);
-			right->SetVelocity(20.0f, .00f);
-			m_Missiles.push_back(right);
-		}
-		else
-		{
-			//発射処理
-			Missile* main = new Missile(Missile::Type::MAIN);
-			main->Init(m_pTex);
-			//発射台の中央から
-			main->SetPosition(m_pLauncher->GetPosition().x + 22.0f, m_pLauncher->GetPosition().y - 40.0f);
-			main->SetVelocity(0.0f, -30.0f);
-			m_Missiles.push_back(main);
-		}
-	}
-	//敵の出現
-	if(rand() % 100 < 2)
-	{
-		Enemy* enemy = new Enemy;
-		enemy->Init(m_pTex);
-		enemy->SetPosition(rand() % 1920, -64.0f);
-		enemy->SetSize(40.0f, 40.0f);
-		m_Enemies.push_back(enemy);
-	}
-	//更新処理
-	for(auto m : m_Missiles)
-	{
-		m->Update();
-	}
-	for(auto e : m_Enemies)
-	{
-		e->Update();
-	}
-	//画面外の削除処理
-	for(auto it = m_Missiles.begin(); it != m_Missiles.end();  ) 
-	{
-		DirectX::XMFLOAT2 pos = (*it)->GetPosition();
-		if(pos.y < -100.0f || pos.x < -100 || pos.x > 2000)
-		{
-			delete *it;
-			it = m_Missiles.erase(it);
-		}
-		else
-		{
-			++it;
-		}
-	}
-	//画面下の敵を消してゲームオーバー
-	for(auto it = m_Enemies.begin(); it != m_Enemies.end(); )
-	{
-		DirectX::XMFLOAT2 pos = (*it)->GetPosition();
-		if(pos.y > 1200.0f)
-		{
-			delete *it;
-			it = m_Enemies.erase(it);
-			m_IsFinished = true;
-		}
-		else
-		{
-			++it;
-		}
-	}
-	//当たり判定
-	for (auto itM = m_Missiles.begin(); itM != m_Missiles.end();)
-	{
-		bool hit = false;
-		for(auto itE = m_Enemies.begin(); itE != m_Enemies.end(); )
-		{
-			//当たり判定
-			ColRes res = CollisionRect(**itM, **itE);
-			if(Col::Any(res))
-			{
-				//ヒットしたら敵とミサイルを削除
-				delete *itE;
-				itE = m_Enemies.erase(itE);
-				hit = true;
-				break;
-			}
-			else
-			{
-				++itE;
-			}
-			if(hit)
-			{
-				delete *itM;
-				itM = m_Missiles.erase(itM);
-			}
-			else
-			{
-				++itM;
-			}
-		}
-	}
+            // 左右にサブミサイル生成
+            float angles[] = { -15.0f, 15.0f, 0.0f };
+            for (float vx : angles)
+            {
+                Missile* sub = new Missile(Missile::Type::SUB);
+                sub->Init(m_pTex);
+                sub->SetPosition(pos.x, pos.y);
+                sub->SetSize(vx == 0 ? 20.0f : 80.0f, vx == 0 ? 80.0f : 20.0f);
+                sub->SetVelocity(vx, -10.0f);
+                m_Missiles.push_back(sub);
+            }
+        }
+        else 
+        {
+            // 新規発射
+            Missile* main = new Missile(Missile::Type::MAIN);
+            main->Init(m_pTex);
+            main->SetPosition(960.0f, 800.0f); // 発射位置
+            main->SetSize(20.0f, 80.0f);
+            main->SetVelocity(0.0f, -10.0f);
+            m_Missiles.push_back(main);
+        }
+    }
+
+    // --- 2. 敵の生成 ---
+    if (rand() % 100 < 3) 
+    {
+        Enemy* e = new Enemy();
+        e->Init(m_pTex);
+        e->SetPosition((float)(rand() % 1600 - 800), -600.0f);
+        e->SetSize(50.0f, 50.0f);
+        m_Enemies.push_back(e);
+    }
+
+    // --- 3. 更新と画面外削除 ---
+    for (auto it = m_Missiles.begin(); it != m_Missiles.end(); )
+    {
+        (*it)->Update();
+        DirectX::XMFLOAT2 p = (*it)->GetPosition();
+        if (p.y < -700.0f || p.x < -1000.0f || p.x > 1000.0f)
+        {
+            delete* it;
+            it = m_Missiles.erase(it);
+        }
+        else it++;
+    }
+
+    for (auto it = m_Enemies.begin(); it != m_Enemies.end(); ) 
+    {
+        (*it)->Update();
+        if ((*it)->GetPosition().y > 600.0f) 
+        {
+            delete* it;
+            it = m_Enemies.erase(it);
+        }
+        else it++;
+    }
+
+    // --- 4. 当たり判定 ---
+    for (auto itM = m_Missiles.begin(); itM != m_Missiles.end(); )
+    {
+        bool hit = false;
+        for (auto itE = m_Enemies.begin(); itE != m_Enemies.end(); )
+        {
+            if (Col::Any(CollisionRect(**itM, **itE))) {
+                delete* itE;
+                itE = m_Enemies.erase(itE);
+                GameData::AddScore(100); // スコア加算
+                hit = true;
+                break;
+            }
+            else itE++;
+        }
+        if (hit)
+        {
+            delete* itM;
+            itM = m_Missiles.erase(itM);
+        }
+        else itM++;
+    }
 	// スペースキーが押されたらシーン終了フラグを立てる
 	if (m_pInput->GetKeyTrigger(VK_SPACE))
 	{
@@ -172,6 +160,8 @@ void StageScene::Draw()
 	{
 		e->Draw(m_pRenderer->GetContext(), m_pSpriteRenderer, viewProj);
 	}
+    // スコア表示
+    m_pUI->DrawNumber(m_pRenderer->GetContext(), m_pSpriteRenderer, GameData::GetScore(), -900.0f, -500.0f, 0.4f);
 	m_pRenderer->EndFrame();
 }
 
