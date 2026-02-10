@@ -1,17 +1,19 @@
 #pragma once
 #include "Character.h"
 
-enum class Type
-{
-	MAIN,//c‚É”ò‚Ô
-	SUB, //‰¡‚É”ò‚Ô
-};
 class Missile :public Character
 {
+public:
+	enum class Type
+	{
+		MAIN,//c‚É”ò‚Ô
+		SUB, //‰¡‚É”ò‚Ô
+	};
 private:
 	Type m_Type;;
 
 public:
+
 	Missile(Type type);
 	~Missile() {};
 

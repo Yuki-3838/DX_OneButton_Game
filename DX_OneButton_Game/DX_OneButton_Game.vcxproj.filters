@@ -99,6 +99,9 @@
     <ClCompile Include="Missile.cpp">
       <Filter>ソース ファイル\ゲームオブジェクト</Filter>
     </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>ソース ファイル\ゲーム</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SpriteRenderer.h">
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="Missile.h">
       <Filter>ヘッダー ファイル\ゲームオブジェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>ヘッダー ファイル\ゲーム</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
