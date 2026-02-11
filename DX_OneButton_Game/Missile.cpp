@@ -2,6 +2,7 @@
 
 Missile::Missile(Type type)
 {
+	m_Type = type;
 	m_Velocity = { 0.0f,0.0f };
 }
 

@@ -27,52 +27,70 @@ void StageScene::Init()
 
 void StageScene::Update()
 {
-	//入力と分裂
-	if (m_pInput->GetKeyTrigger(VK_LBUTTON))
-	{
-		//画面内に「メインミサイル」があるかを探す
-		Missile* pMain = nullptr;
+    //入力と分裂
+    if (m_pInput->GetKeyTrigger(VK_LBUTTON))
+    {
+        //画面内にミサイルがあるかを探す
+        Missile* pMissile = nullptr;
         size_t index = 0;
         bool found = false;
 
+        // 最初に見つかったミサイルを取得
         for (size_t i = 0; i < m_Missiles.size(); ++i)
         {
-            if (m_Missiles[i]->GetType() == Missile::Type::MAIN) 
-            {
-                pMain = m_Missiles[i];
-                index = i;
-                found = true;
-                break;
-            }
+            pMissile = m_Missiles[i];
+            index = i;
+            found = true;
+            break;
         }
 
         if (found)
         {
             // 分裂処理
-            DirectX::XMFLOAT2 pos = pMain->GetPosition();
+            DirectX::XMFLOAT2 pos = pMissile->GetPosition();
+            Missile::Type type = pMissile->GetType();
+
+            // 元のミサイルを削除
             delete m_Missiles[index];
             m_Missiles.erase(m_Missiles.begin() + index);
 
-            // 左右にサブミサイル生成
-            float angles[] = { -15.0f, 15.0f, 0.0f };
-            for (float vx : angles)
+            if (type == Missile::Type::MAIN)
             {
-                Missile* sub = new Missile(Missile::Type::SUB);
-                sub->Init(m_pTex);
-                sub->SetPosition(pos.x, pos.y);
-                sub->SetSize(vx == 0 ? 20.0f : 80.0f, vx == 0 ? 80.0f : 20.0f);
-                sub->SetVelocity(vx, -10.0f);
-                m_Missiles.push_back(sub);
+                // 縦ミサイル → 横2つに分裂
+                float speeds[] = { -15.0f, 15.0f };  // 左右の速度
+                for (float vx : speeds)
+                {
+                    Missile* sub = new Missile(Missile::Type::SUB);
+                    sub->Init(m_pTex);
+                    sub->SetPosition(pos.x, pos.y);
+                    sub->SetSize(80.0f, 20.0f);  // 横長
+                    sub->SetVelocity(vx, 0.0f);  // 横方向のみ
+                    m_Missiles.push_back(sub);
+                }
+            }
+            else if (type == Missile::Type::SUB)
+            {
+                // 横ミサイル → 縦2つに分裂
+                float speeds[] = { -10.0f, 10.0f };  // 上下の速度
+                for (float vy : speeds)
+                {
+                    Missile* main = new Missile(Missile::Type::MAIN);
+                    main->Init(m_pTex);
+                    main->SetPosition(pos.x, pos.y);
+                    main->SetSize(20.0f, 80.0f);  // 縦長
+                    main->SetVelocity(0.0f, vy);  // 縦方向のみ
+                    m_Missiles.push_back(main);
+                }
             }
         }
-        else 
+        else
         {
-            // 新規発射
+            // ミサイルがない場合は新規発射（最初の縦ミサイル）
             Missile* main = new Missile(Missile::Type::MAIN);
             main->Init(m_pTex);
             main->SetPosition(960.0f, 800.0f); // 発射位置
             main->SetSize(20.0f, 80.0f);
-            main->SetVelocity(0.0f, -10.0f);
+            main->SetVelocity(0.0f, -10.0f);  // 上に飛ぶ
             m_Missiles.push_back(main);
         }
     }
