@@ -6,11 +6,13 @@ class Missile :public Character
 public:
 	enum class Type
 	{
-		MAIN,//c‚É”ò‚Ô
-		SUB, //‰¡‚É”ò‚Ô
+		MAIN,       //Å‰‚Ìˆê”­
+		HORIZONTAL, //‰¡‚É”ò‚Ô
+		VERTICAL,   //c‚É”ò‚Ô
 	};
 private:
-	Type m_Type;;
+	Type m_Type;
+	DirectX::XMFLOAT2 m_Velocity;
 
 public:
 

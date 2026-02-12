@@ -20,7 +20,7 @@ void StageScene::Init()
 	//発射台(画面中央)
 	m_pLauncher = new GameObject;
 	m_pLauncher->Init(m_pTex);
-	m_pLauncher->SetPosition(1920.0f / 2.0f - 32.0f, 900.0f);
+	m_pLauncher->SetPosition(0.0f,400.0f);
 	m_pLauncher->SetSize(64.0f, 64.0f);
 
 }
@@ -30,68 +30,88 @@ void StageScene::Update()
     //入力と分裂
     if (m_pInput->GetKeyTrigger(VK_LBUTTON))
     {
-        //画面内にミサイルがあるかを探す
-        Missile* pMissile = nullptr;
-        size_t index = 0;
-        bool found = false;
-
-        // 最初に見つかったミサイルを取得
-        for (size_t i = 0; i < m_Missiles.size(); ++i)
+        //画面にミサイルが1つもないなら「新規発射」
+        if (m_Missiles.empty())
         {
-            pMissile = m_Missiles[i];
-            index = i;
-            found = true;
-            break;
-        }
-
-        if (found)
-        {
-            // 分裂処理
-            DirectX::XMFLOAT2 pos = pMissile->GetPosition();
-            Missile::Type type = pMissile->GetType();
-
-            // 元のミサイルを削除
-            delete m_Missiles[index];
-            m_Missiles.erase(m_Missiles.begin() + index);
-
-            if (type == Missile::Type::MAIN)
-            {
-                // 縦ミサイル → 横2つに分裂
-                float speeds[] = { -15.0f, 15.0f };  // 左右の速度
-                for (float vx : speeds)
-                {
-                    Missile* sub = new Missile(Missile::Type::SUB);
-                    sub->Init(m_pTex);
-                    sub->SetPosition(pos.x, pos.y);
-                    sub->SetSize(80.0f, 20.0f);  // 横長
-                    sub->SetVelocity(vx, 0.0f);  // 横方向のみ
-                    m_Missiles.push_back(sub);
-                }
-            }
-            else if (type == Missile::Type::SUB)
-            {
-                // 横ミサイル → 縦2つに分裂
-                float speeds[] = { -10.0f, 10.0f };  // 上下の速度
-                for (float vy : speeds)
-                {
-                    Missile* main = new Missile(Missile::Type::MAIN);
-                    main->Init(m_pTex);
-                    main->SetPosition(pos.x, pos.y);
-                    main->SetSize(20.0f, 80.0f);  // 縦長
-                    main->SetVelocity(0.0f, vy);  // 縦方向のみ
-                    m_Missiles.push_back(main);
-                }
-            }
-        }
-        else
-        {
-            // ミサイルがない場合は新規発射（最初の縦ミサイル）
             Missile* main = new Missile(Missile::Type::MAIN);
             main->Init(m_pTex);
-            main->SetPosition(960.0f, 800.0f); // 発射位置
-            main->SetSize(20.0f, 80.0f);
-            main->SetVelocity(0.0f, -10.0f);  // 上に飛ぶ
+            main->SetPosition(0.0f, 400.0f); // 発射位置
+            main->SetSize(20.0f, 80.0f);     // 縦長
+            main->SetVelocity(0.0f, -10.0f); // 上へ
             m_Missiles.push_back(main);
+        }
+        //ミサイルがあるなら「無限分裂サイクル」
+        else
+        {
+            std::vector<Missile*> nextMissiles; // 新しく生まれるミサイル用
+
+            // 現在のミサイルをすべてチェックして分裂させる
+            for (auto it = m_Missiles.begin(); it != m_Missiles.end(); )
+            {
+                Missile* m = *it;
+                DirectX::XMFLOAT2 pos = m->GetPosition();
+                bool split = false;
+
+                // --- パターン1: MAIN(上) または VERTICAL(上下) なら -> 左右へ分裂 ---
+                if (m->GetType() == Missile::Type::MAIN || m->GetType() == Missile::Type::VERTICAL)
+                {
+                    // 左へ (HORIZONTAL)
+                    Missile* left = new Missile(Missile::Type::HORIZONTAL);
+                    left->Init(m_pTex);
+                    left->SetPosition(pos.x, pos.y);
+                    left->SetSize(80.0f, 20.0f);    // 横長
+                    left->SetVelocity(-12.0f, 0.0f);
+                    nextMissiles.push_back(left);
+
+                    // 右へ (HORIZONTAL)
+                    Missile* right = new Missile(Missile::Type::HORIZONTAL);
+                    right->Init(m_pTex);
+                    right->SetPosition(pos.x, pos.y);
+                    right->SetSize(80.0f, 20.0f);    // 横長
+                    right->SetVelocity(12.0f, 0.0f);
+                    nextMissiles.push_back(right);
+
+                    split = true;
+                }
+                // ---パターン2: HORIZONTAL(左右) なら -> 上下へ分裂 ---
+                else if (m->GetType() == Missile::Type::HORIZONTAL)
+                {
+                    //上へ(VERTICAL)
+                    Missile* up = new Missile(Missile::Type::VERTICAL);
+                    up->Init(m_pTex);
+                    up->SetPosition(pos.x, pos.y);
+                    up->SetSize(20.0f, 80.0f);      // 縦長
+                    up->SetVelocity(0.0f, -12.0f);
+                    nextMissiles.push_back(up);
+
+                    //下へ(VERTICAL)
+                    Missile* down = new Missile(Missile::Type::VERTICAL);
+                    down->Init(m_pTex);
+                    down->SetPosition(pos.x, pos.y);
+                    down->SetSize(20.0f, 80.0f);      // 縦長
+                    down->SetVelocity(0.0f, 12.0f);
+                    nextMissiles.push_back(down);
+
+                    split = true;
+                }
+
+                //分裂したら元のミサイルは削除
+                if (split)
+                {
+                    delete m;
+                    it = m_Missiles.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+
+            //新しく生まれたミサイルをリストに追加
+            for (auto* nm : nextMissiles)
+            {
+                m_Missiles.push_back(nm);
+            }
         }
     }
 
@@ -110,7 +130,7 @@ void StageScene::Update()
     {
         (*it)->Update();
         DirectX::XMFLOAT2 p = (*it)->GetPosition();
-        if (p.y < -700.0f || p.x < -1000.0f || p.x > 1000.0f)
+        if (p.y < -550.0f ||p.y > 550.0f || p.x < -970.0f || p.x > 980.0f)
         {
             delete* it;
             it = m_Missiles.erase(it);

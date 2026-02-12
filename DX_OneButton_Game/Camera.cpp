@@ -8,12 +8,14 @@ Camera::Camera(int screenWidth, int screenHeight)
     m_Position.x = 0.0f;
     m_Position.y = 0.0f;
 
+    float halfW = static_cast<float>(screenWidth) / 2.0f;
+    float halfH = static_cast<float>(screenHeight) / 2.0f;
     // 2Dゲーム用の平行投影行列（画面左上を0,0、右下をscreenWidth, screenHeightにする）
     m_ProjMatrix = XMMatrixOrthographicOffCenterLH(
-        0.0f,
-        static_cast<float>(screenWidth),
-        static_cast<float>(screenHeight),
-        0.0f,
+       -halfW,
+        halfW,
+        halfH,
+       -halfH,
         0.0f,
         1.0f
     );
