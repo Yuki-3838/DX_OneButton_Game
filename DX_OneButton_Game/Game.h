@@ -19,6 +19,9 @@ private:
     HWND m_hWnd;
 
 public:
+    //画面サイズを定義
+    static const int SCREEN_WIDTH = 1280;
+	static const int SCREEN_HEIGHT = 720;
     Game();
     ~Game();
 

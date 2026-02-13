@@ -9,8 +9,6 @@
 #define CLASS_NAME   "DX21Hew"// ウインドウクラスの名前
 #define WINDOW_NAME  "DirectX初期化"// ウィンドウの名前
 
-#define SCREEN_WIDTH (1920)		// ウインドウの幅
-#define SCREEN_HEIGHT (1080)		// ウインドウの高さ
 
 
 // 関数のプロトタイプ宣言
@@ -25,6 +23,8 @@ bool g_showA = false;   // Aを表示するかどうか
 //--------------------------------------------------------------------------------------
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
+	int w = Game::SCREEN_WIDTH;
+	int h = Game::SCREEN_HEIGHT;
 	// ウィンドウクラス情報をまとめる
 	WNDCLASSEX wc;
 	wc.cbSize = sizeof(WNDCLASSEX); //この構造体のサイズ
@@ -52,8 +52,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		WS_OVERLAPPEDWINDOW,	// ウィンドウスタイル
 		CW_USEDEFAULT,			// ウィンドウの左上Ｘ座標
 		CW_USEDEFAULT,			// ウィンドウの左上Ｙ座標 
-		SCREEN_WIDTH,			// ウィンドウの幅
-		SCREEN_HEIGHT,			// ウィンドウの高さ
+		w,			            // ウィンドウの幅
+		h,			            // ウィンドウの高さ
 		NULL,					// 親ウィンドウのハンドル
 		NULL,					// メニューハンドルまたは子ウィンドウID
 		hInstance,				// インスタンスハンドル
@@ -63,8 +63,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	RECT rc1, rc2;
 	GetWindowRect(hWnd, &rc1);
 	GetClientRect(hWnd, &rc2);
-	int sx = SCREEN_WIDTH;
-	int sy = SCREEN_HEIGHT;
+	int sx = w;
+	int sy = h;
 	sx += ((rc1.right - rc1.left)) - ((rc2.right - rc2.left));
 	sy += ((rc1.bottom - rc1.top)) - ((rc2.bottom - rc2.top));
 	SetWindowPos(hWnd, NULL, 0, 0, sx, sy, (SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOMOVE));
@@ -76,7 +76,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
 	//ゲームの初期化
 	Game game;
-	game.Init(hWnd, SCREEN_WIDTH, SCREEN_HEIGHT);
+	game.Init(hWnd, w, h);
 	
 
 	MSG msg;

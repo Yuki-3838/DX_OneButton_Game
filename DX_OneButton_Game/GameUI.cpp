@@ -1,6 +1,7 @@
 #include "GameUI.h"
 #include "GameData.h"
 #include <cmath>
+#include "Game.h"
 
 GameUI::GameUI() {}
 GameUI::~GameUI() {}
@@ -11,12 +12,7 @@ void GameUI::Init(ID3D11Device* device, ResourceManager* resMgr)
     m_pTimeNumberTex = resMgr->LoadTexture("asset/texture/Number.png", device);
     //m_pScoreNumberTex = resMgr->LoadTexture("asset/texture/Numbers.png", device);
 
-    m_pSkillGaugeTex = resMgr->LoadTexture("asset/texture/UI_skill_meter.png", device);     // 緑や赤のバー
-    m_pUltGaugeTex = resMgr->LoadTexture("asset/texture/UI_UI_special_meter.png", device);     // 緑や赤のバー
-    m_pGaugeFrameTex = resMgr->LoadTexture("asset/texture/UI_skill_frame.png", device);      // バーの枠
-    m_pGaugeBackGroundTex = resMgr->LoadTexture("asset/texture/UI_skill.png", device);      // バーの枠
-
-    m_pCamera = new Camera(1920,1080);
+    m_pCamera = new Camera(Game::SCREEN_WIDTH,Game::SCREEN_HEIGHT);
     m_pCamera->SetPosition(0.0f, 0.0f);
 }
 

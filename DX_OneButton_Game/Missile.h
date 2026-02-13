@@ -13,16 +13,18 @@ public:
 private:
 	Type m_Type;
 	DirectX::XMFLOAT2 m_Velocity;
+	int generation; //分裂回数
 
 public:
 
-	Missile(Type type);
+	Missile(Type type,int generation = 0);
 	~Missile() {};
 
 	void Update();
 
 	//ゲッター・セッター
 	Type GetType() { return m_Type; }
+	int GetGeneration() { return generation; }
 	void SetVelocity(float vx, float vy) { m_Velocity = { vx,vy }; }
 };
 

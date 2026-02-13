@@ -1,6 +1,6 @@
 #include "Missile.h"
 
-Missile::Missile(Type type)
+Missile::Missile(Type type,int generation) : m_Type(type),generation(generation)
 {
 	m_Type = type;
 	m_Velocity = { 0.0f,0.0f };
