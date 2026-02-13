@@ -15,8 +15,8 @@ private:
     GameUI* m_pUI;          // ゲームUI
 
     // テクスチャ管理用
-    ID3D11ShaderResourceView* m_pPlayerTex;
-    ID3D11ShaderResourceView* m_pFloorTex;
+    ID3D11ShaderResourceView* m_pBgTex;
+    ID3D11ShaderResourceView* m_pLauncherTex;
 
     bool m_IsFinished;          // ゲーム終了フラグ
 

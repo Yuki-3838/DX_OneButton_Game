@@ -24,7 +24,11 @@ public:
 
 	//ゲッター・セッター
 	Type GetType() { return m_Type; }
+	void SetType(Type type) { m_Type = type; }
+
 	int GetGeneration() { return generation; }
+	
+	DirectX::XMFLOAT2 GetVelocity()const { return m_Velocity; }
 	void SetVelocity(float vx, float vy) { m_Velocity = { vx,vy }; }
 };
 
