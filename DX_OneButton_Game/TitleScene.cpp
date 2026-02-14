@@ -12,7 +12,7 @@ void TitleScene::Init()
 void TitleScene::Update()
 {
 	// スペースキーが押されたら次のシーン（Stage1）へ
-	if (m_pInput->GetKeyTrigger(VK_RETURN))
+	if (m_pInput->GetKeyTrigger(VK_LBUTTON))
 	{
 		m_IsFinished = true;
 	}

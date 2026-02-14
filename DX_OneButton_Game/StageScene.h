@@ -31,8 +31,6 @@ public:
         : Scene(renderer, resManager, spriteRenderer, input)
     {
         m_pCamera = nullptr;
-        m_pPlayerTex = nullptr;
-        m_pFloorTex = nullptr;
         m_pTex = nullptr;
         m_IsFinished = false;
 
