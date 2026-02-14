@@ -58,36 +58,49 @@ void StageScene::Update()
         }
         else
         {
-            // ★現在の数が上限を超えているかチェック
+            //現在の数が上限を超えているかチェック
             if (m_Missiles.size() >= MAX_MISSILE_COUNT)
             {
                 // ----------------------------------------------------
                 // 回転処理 (上限に達しているので、分裂せずに方向転換)
-                // ----------------------------------------------------
+              // ----------------------------------------------------
                 for (auto* m : m_Missiles)
                 {
-                    // 現在の速度を取得
                     DirectX::XMFLOAT2 v = m->GetVelocity();
 
-                    // 90度回転させる計算 (X = -Y, Y = X)
-                    // これで 上→右→下→左→上... と回転します
+                    // 90度回転させる計算
                     float newVx = -v.y;
                     float newVy = v.x;
-
                     m->SetVelocity(newVx, newVy);
 
-                    // 向きに合わせて見た目（サイズ）とタイプも更新
-                    if (m->GetType() == Missile::Type::MAIN || m->GetType() == Missile::Type::VERTICAL)
+                    // ★飛ぶ方向(Velocity)に合わせて、画像とサイズを完璧にセットする
+                    if (newVy < 0) 
                     {
-                        // 縦から横へ
-                        m->SetType(Missile::Type::HORIZONTAL); //Type変更
-                        m->SetSize(80.0f, 20.0f); // 横長
+                        // 上へ飛ぶ
+                        m->SetType(Missile::Type::VERTICAL);
+                        m->SetSize(20.0f, 80.0f);
+                        m->Init(m_pMissileTex);
                     }
-                    else if (m->GetType() == Missile::Type::HORIZONTAL)
+                    else if (newVy > 0)
                     {
-                        // 横から縦へ
-                        m->SetType(Missile::Type::VERTICAL);   // ★Type変更
-                        m->SetSize(20.0f, 80.0f); // 縦長
+                        // 下へ飛ぶ
+                        m->SetType(Missile::Type::VERTICAL);
+                        m->SetSize(20.0f, 80.0f);
+                        m->Init(m_pBottomMissileTex);
+                    }
+                    else if (newVx < 0)
+                    {
+                        // 左へ飛ぶ
+                        m->SetType(Missile::Type::HORIZONTAL);
+                        m->SetSize(80.0f, 20.0f);
+                        m->Init(m_pLeftMissileTex);
+                    }
+                    else if (newVx > 0) 
+                    {
+                        // 右へ飛ぶ
+                        m->SetType(Missile::Type::HORIZONTAL);
+                        m->SetSize(80.0f, 20.0f);
+                        m->Init(m_pRightMissileTex);
                     }
                 }
             }
