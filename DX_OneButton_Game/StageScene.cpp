@@ -10,6 +10,13 @@ void StageScene::Init()
 	m_pCamera->SetPosition(0.0f, 0.0f);
 
 	m_pTex = m_pResourceManager->LoadTexture("asset/texture/title.png",m_pRenderer->GetDevice());
+	m_pLauncherTex = m_pResourceManager->LoadTexture("asset/texture/Launcher.png",m_pRenderer->GetDevice());
+	m_pMissileTex = m_pResourceManager->LoadTexture("asset/texture/Missile.png",m_pRenderer->GetDevice());
+	m_pLeftMissileTex = m_pResourceManager->LoadTexture("asset/texture/LeftMissile.png",m_pRenderer->GetDevice());
+	m_pRightMissileTex = m_pResourceManager->LoadTexture("asset/texture/RightMissile.png",m_pRenderer->GetDevice());
+	m_pBottomMissileTex = m_pResourceManager->LoadTexture("asset/texture/BottomMissile.png",m_pRenderer->GetDevice());
+	m_pEnemyTex = m_pResourceManager->LoadTexture("asset/texture/Enemy.png",m_pRenderer->GetDevice());
+	m_pFriendTex = m_pResourceManager->LoadTexture("asset/texture/Friend.png",m_pRenderer->GetDevice());
 
 	//UIの初期化
 	m_pUI = new GameUI();
@@ -20,7 +27,7 @@ void StageScene::Init()
 	
 	//発射台(画面中央)
 	m_pLauncher = new GameObject;
-	m_pLauncher->Init(m_pTex);
+	m_pLauncher->Init(m_pLauncherTex);
 
     float bottomY = Game::SCREEN_HEIGHT / 2.0f;
 	m_pLauncher->SetPosition(0.0f, bottomY - 50.0f);
@@ -43,7 +50,7 @@ void StageScene::Update()
         if (m_Missiles.empty())
         {
             Missile* main = new Missile(Missile::Type::MAIN, 0);
-            main->Init(m_pTex);
+            main->Init(m_pMissileTex);
             main->SetPosition(0.0f, 400.0f);
             main->SetSize(20.0f, 80.0f);
             main->SetVelocity(0.0f, -10.0f);
@@ -97,21 +104,22 @@ void StageScene::Update()
                     DirectX::XMFLOAT2 pos = m->GetPosition();
                     int currentGen = m->GetGeneration();
                     bool split = false;
+					float offset = 40.0f; // 分裂後の弾の位置を少しずらすためのオフセット
 
                     // --- 分裂ロジック ---
                     if (m->GetType() == Missile::Type::MAIN || m->GetType() == Missile::Type::VERTICAL)
                     {
                         // 左右へ
                         Missile* left = new Missile(Missile::Type::HORIZONTAL, currentGen + 1);
-                        left->Init(m_pTex);
-                        left->SetPosition(pos.x, pos.y);
+                        left->Init(m_pLeftMissileTex);
+                        left->SetPosition(pos.x - offset, pos.y);
                         left->SetSize(80.0f, 20.0f);
                         left->SetVelocity(-12.0f, 0.0f);
                         nextMissiles.push_back(left);
 
                         Missile* right = new Missile(Missile::Type::HORIZONTAL, currentGen + 1);
-                        right->Init(m_pTex);
-                        right->SetPosition(pos.x, pos.y);
+                        right->Init(m_pRightMissileTex);
+                        right->SetPosition(pos.x + offset, pos.y);
                         right->SetSize(80.0f, 20.0f);
                         right->SetVelocity(12.0f, 0.0f);
                         nextMissiles.push_back(right);
@@ -121,15 +129,15 @@ void StageScene::Update()
                     {
                         // 上下へ
                         Missile* up = new Missile(Missile::Type::VERTICAL, currentGen + 1);
-                        up->Init(m_pTex);
-                        up->SetPosition(pos.x, pos.y);
+                        up->Init(m_pMissileTex);
+                        up->SetPosition(pos.x, pos.y - offset);
                         up->SetSize(20.0f, 80.0f);
                         up->SetVelocity(0.0f, -12.0f);
                         nextMissiles.push_back(up);
 
                         Missile* down = new Missile(Missile::Type::VERTICAL, currentGen + 1);
-                        down->Init(m_pTex);
-                        down->SetPosition(pos.x, pos.y);
+                        down->Init(m_pBottomMissileTex);
+                        down->SetPosition(pos.x, pos.y + offset);
                         down->SetSize(20.0f, 80.0f);
                         down->SetVelocity(0.0f, 12.0f);
                         nextMissiles.push_back(down);
@@ -165,18 +173,20 @@ void StageScene::Update()
         float rangeX = (float)Game::SCREEN_WIDTH - 50.0f;
 
         Enemy* e = new Enemy();
-        e->Init(m_pTex);
-        e->SetPosition((float)(rand() % (int)rangeX - (rangeX / 2)), spawnY);
         e->SetSize(50.0f, 50.0f);
-        // ★20%の確率で「味方(FRIEND)」にする
-        if (rand() % 100 < 20)
+        //10%の確率で「味方(FRIEND)」にする
+        if (rand() % 100 < 10)
         {
+            e->Init(m_pFriendTex);
+            e->SetPosition((float)(rand() % (int)rangeX - (rangeX / 2)), spawnY);
             e->SetType(Enemy::Type::FRIEND);
             // 味方は見た目を変えたいので、少し小さくしたり色を変えたりしたい
             // (描画時に色を変えるのが一番わかりやすいです。後述のDraw参照)
         }
         else
         {
+            e->Init(m_pEnemyTex);
+            e->SetPosition((float)(rand() % (int)rangeX - (rangeX / 2)), spawnY);
             e->SetType(Enemy::Type::NORMAL);
         }
         m_Enemies.push_back(e);

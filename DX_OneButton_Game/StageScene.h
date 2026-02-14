@@ -16,12 +16,18 @@ private:
 
     // テクスチャ管理用
     ID3D11ShaderResourceView* m_pBgTex;
+    ID3D11ShaderResourceView* m_pTex;
     ID3D11ShaderResourceView* m_pLauncherTex;
+    ID3D11ShaderResourceView* m_pMissileTex;
+    ID3D11ShaderResourceView* m_pLeftMissileTex;
+    ID3D11ShaderResourceView* m_pRightMissileTex;
+    ID3D11ShaderResourceView* m_pBottomMissileTex;
+    ID3D11ShaderResourceView* m_pEnemyTex;
+    ID3D11ShaderResourceView* m_pFriendTex;
 
     bool m_IsFinished;          // ゲーム終了フラグ
 
     GameObject* m_pLauncher;    // ミサイル発射台
-    ID3D11ShaderResourceView* m_pTex;
     std::vector<Missile*> m_Missiles; // ミサイルのリスト
     std::vector<Enemy*> m_Enemies; //敵管理リスト
 
@@ -32,6 +38,13 @@ public:
     {
         m_pCamera = nullptr;
         m_pTex = nullptr;
+        m_pLauncherTex = nullptr;
+        m_pMissileTex = nullptr;
+        m_pLeftMissileTex = nullptr;
+        m_pRightMissileTex = nullptr;
+        m_pBottomMissileTex = nullptr;
+        m_pEnemyTex = nullptr;
+        m_pFriendTex = nullptr;
         m_IsFinished = false;
 
         Init(); // 初期化実行

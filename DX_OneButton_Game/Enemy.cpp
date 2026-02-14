@@ -2,7 +2,7 @@
 
 Enemy::Enemy()
 {
-	fallSpeed = 3.0f;
+	fallSpeed = 2.0f;
 }
 
 void Enemy::Update()
