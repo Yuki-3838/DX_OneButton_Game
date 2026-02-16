@@ -24,6 +24,7 @@ private:
     ID3D11ShaderResourceView* m_pBottomMissileTex;
     ID3D11ShaderResourceView* m_pEnemyTex;
     ID3D11ShaderResourceView* m_pFriendTex;
+    ID3D11ShaderResourceView* m_pFriend2Tex;
 
     bool m_IsFinished;          // ゲーム終了フラグ
 
@@ -45,6 +46,7 @@ public:
         m_pBottomMissileTex = nullptr;
         m_pEnemyTex = nullptr;
         m_pFriendTex = nullptr;
+        m_pFriend2Tex = nullptr;
         m_IsFinished = false;
 
         Init(); // 初期化実行

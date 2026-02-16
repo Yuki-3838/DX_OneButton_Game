@@ -17,6 +17,7 @@ void StageScene::Init()
 	m_pBottomMissileTex = m_pResourceManager->LoadTexture("asset/texture/BottomMissile.png",m_pRenderer->GetDevice());
 	m_pEnemyTex = m_pResourceManager->LoadTexture("asset/texture/Enemy.png",m_pRenderer->GetDevice());
 	m_pFriendTex = m_pResourceManager->LoadTexture("asset/texture/Friend.png",m_pRenderer->GetDevice());
+	m_pFriend2Tex = m_pResourceManager->LoadTexture("asset/texture/Friend2.png",m_pRenderer->GetDevice());
 
 	//UIの初期化
 	m_pUI = new GameUI();
@@ -190,11 +191,13 @@ void StageScene::Update()
         //10%の確率で「味方(FRIEND)」にする
         if (rand() % 100 < 10)
         {
-            e->Init(m_pFriendTex);
-            e->SetPosition((float)(rand() % (int)rangeX - (rangeX / 2)), spawnY);
+
             e->SetType(Enemy::Type::FRIEND);
-            // 味方は見た目を変えたいので、少し小さくしたり色を変えたりしたい
-            // (描画時に色を変えるのが一番わかりやすいです。後述のDraw参照)
+            //最初は「無敵用」の画像で初期化する
+            e->Init(m_pFriend2Tex);
+            e->SetPosition((float)(rand() % (int)rangeX - (rangeX / 2)), spawnY);
+            //20フレーム（約2秒間）無敵にする！
+            e->SetInvincibleTime(120);
         }
         else
         {
@@ -225,6 +228,11 @@ void StageScene::Update()
 
     for (auto it = m_Enemies.begin(); it != m_Enemies.end(); )
     {
+        Enemy* e = *it;
+        if (e->GetType() == Enemy::Type::FRIEND && e->GetInvincibleTime() == 1)
+        { 	//無敵時間が切れた味方は、通常の見た目に変える
+            e->Init(m_pFriendTex);
+        }
         (*it)->Update();
         // 画面下に行ったら？
         if ((*it)->GetPosition().y > limitY)
@@ -259,8 +267,16 @@ void StageScene::Update()
                 // ★当たった相手の種類を確認
                 if ((*itE)->GetType() == Enemy::Type::FRIEND)
                 {
-                    // 味方を撃ってしまった！ -> ゲームオーバー
-                    m_IsFinished = true;
+                    if ((*itE)->IsInvincible())
+                    {
+                        itE++;
+                        continue;
+                    }
+                    else
+                    {
+                        // 味方を撃ってしまった！ -> ゲームオーバー
+                        m_IsFinished = true;
+                    }
                 }
                 else
                 {

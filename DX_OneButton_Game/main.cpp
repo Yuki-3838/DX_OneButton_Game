@@ -25,6 +25,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 {
 	int w = Game::SCREEN_WIDTH;
 	int h = Game::SCREEN_HEIGHT;
+
+	RECT rc = { 0, 0, w, h };
+	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+	int windowWidth = rc.right - rc.left;   // 補正後の幅
+	int windowHeight = rc.bottom - rc.top;  // 補正後の高さ
 	// ウィンドウクラス情報をまとめる
 	WNDCLASSEX wc;
 	wc.cbSize = sizeof(WNDCLASSEX); //この構造体のサイズ

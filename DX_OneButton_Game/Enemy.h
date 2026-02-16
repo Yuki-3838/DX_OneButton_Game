@@ -11,6 +11,7 @@ public:
 private:
 	float fallSpeed;
 	Type m_Type;
+	int m_InvincibleTime;//無敵時間
 public:
 	Enemy();
 	~Enemy() {};
@@ -20,5 +21,9 @@ public:
 	//ゲッター・セッター
 	void SetType(Type type) { m_Type = type; }
 	Type GetType() { return m_Type; }
+
+	void SetInvincibleTime(int time) { m_InvincibleTime = time; }
+	int GetInvincibleTime() { return m_InvincibleTime; }
+	bool IsInvincible() { return m_InvincibleTime > 0; }
 };
 
