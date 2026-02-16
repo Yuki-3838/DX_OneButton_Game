@@ -10,6 +10,7 @@ void StageScene::Init()
 	m_pCamera->SetPosition(0.0f, 0.0f);
 
 	m_pTex = m_pResourceManager->LoadTexture("asset/texture/title.png",m_pRenderer->GetDevice());
+	m_pBgTex = m_pResourceManager->LoadTexture("asset/texture/bg.png",m_pRenderer->GetDevice());
 	m_pLauncherTex = m_pResourceManager->LoadTexture("asset/texture/Launcher.png",m_pRenderer->GetDevice());
 	m_pMissileTex = m_pResourceManager->LoadTexture("asset/texture/Missile.png",m_pRenderer->GetDevice());
 	m_pLeftMissileTex = m_pResourceManager->LoadTexture("asset/texture/LeftMissile.png",m_pRenderer->GetDevice());
@@ -29,10 +30,16 @@ void StageScene::Init()
 	//”­ŽË‘ä(‰æ–Ê’†‰›)
 	m_pLauncher = new GameObject;
 	m_pLauncher->Init(m_pLauncherTex);
-
     float bottomY = Game::SCREEN_HEIGHT / 2.0f;
-	m_pLauncher->SetPosition(0.0f, bottomY - 50.0f);
-	m_pLauncher->SetSize(64.0f, 64.0f);
+    m_pLauncher->SetPosition(-20.0f, bottomY - 50.0f);
+    m_pLauncher->SetSize(64.0f, 64.0f);
+
+    float leftX = -(Game::SCREEN_WIDTH / 2.0f);
+    float topY = -(Game::SCREEN_HEIGHT / 2.0f);
+    m_pBackground = new GameObject();
+    m_pBackground->Init(m_pBgTex);
+    m_pBackground->SetPosition(leftX, topY); // ‰æ–Ê’†‰›
+    m_pBackground->SetSize((float)Game::SCREEN_WIDTH, (float)Game::SCREEN_HEIGHT); // ‰æ–Ê‚¢‚Á‚Ï‚¢‚ÉL‚°‚é
 
 }
 
@@ -310,7 +317,10 @@ void StageScene::Draw()
 	m_pRenderer->StartFrame(clearColor);
 
 	DirectX::XMMATRIX viewProj = m_pCamera->GetViewProjection();
-
+    if (m_pBackground) 
+    {
+        m_pBackground->Draw(m_pRenderer->GetContext(), m_pSpriteRenderer, viewProj);
+    }
 	//”­ŽË‘ä‚Ì•`‰æ
 	m_pLauncher->Draw(m_pRenderer->GetContext(), m_pSpriteRenderer,viewProj);
 

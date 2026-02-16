@@ -29,6 +29,7 @@ private:
     bool m_IsFinished;          // ゲーム終了フラグ
 
     GameObject* m_pLauncher;    // ミサイル発射台
+    GameObject* m_pBackground;    // ミサイル発射台
     std::vector<Missile*> m_Missiles; // ミサイルのリスト
     std::vector<Enemy*> m_Enemies; //敵管理リスト
 
@@ -38,6 +39,7 @@ public:
         : Scene(renderer, resManager, spriteRenderer, input)
     {
         m_pCamera = nullptr;
+        m_pBgTex = nullptr;
         m_pTex = nullptr;
         m_pLauncherTex = nullptr;
         m_pMissileTex = nullptr;
